@@ -1,0 +1,23 @@
+{
+  "name": "cs-forum-2021",
+  "version": "1.0.0",
+  "description": "- npm init - node install --save   - express   - body-parser   - mongoose - docker   - docker run -d --name cs-todo-2021-mongo -e MONGO_INITDB_ROOT_USERNAME=user -e MONGO_INITDB_ROOT_PASSWORD=password -e MONGO_INITDB_DATABASE=cs-forum-2021 -p 27017:27017 -v $PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/ mongo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcfug8/cs-forum-2021.git"
+  },
+  "author": "Jace Fugate",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jcfug8/cs-forum-2021/issues"
+  },
+  "homepage": "https://github.com/jcfug8/cs-forum-2021#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.12.7"
+  }
+}
