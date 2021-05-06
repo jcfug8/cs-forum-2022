@@ -70,7 +70,9 @@ server.post("/thread", (req, res) => {
 server.post("/post", (req, res) => {
   console.log(`request to insert a post: `, req.body);
   let deadline;
-  Thread.create(
+
+  Thread.findById(req.params.id);
+  Post.create(
     {
       name: req.body.name || "",
       description: req.body.description || "",
