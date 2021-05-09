@@ -66,62 +66,6 @@ server.post("/thread", (req, res) => {
   );
 });
 
-// this handler is what is used to insert a post
-server.post("/post", (req, res) => {
-  console.log(`request to insert a post: `, req.body);
-  let deadline;
-
-  Thread.findById(req.params.id);
-  Post.create(
-    {
-      name: req.body.name || "",
-      description: req.body.description || "",
-    },
-    function (err, post) {
-      res.setHeader("Content-Type", "application/json");
-      if (err) {
-        res.status(500).send({
-          message: `post request failed to create post`,
-          error: err,
-        });
-        return;
-      }
-      res.status(201).json(post);
-    }
-  );
-});
-
-// this handler is what is used to update a thread
-server.patch("/thread/:id", (req, res) => {
-  console.log(`request to patch a thread with id ${req.params.id}: `, req.body);
-  updateThread = {};
-  if (req.body.name) {
-    updateThread.name = req.body.name;
-  }
-  if (req.body.description) {
-    updateThread.description = req.body.description;
-  }
-  console.log(`patching data - ${req.params.id}:`, updateThread);
-  Thread.updateOne(
-    { _id: req.params.id },
-    {
-      $set: updateThread,
-    },
-    function (err, thread) {
-      res.setHeader("Content-Type", "application/json");
-      if (err) {
-        res.status(500).send({
-          message: `patch request failed to replace thread`,
-          id: req.params.id,
-          error: err,
-        });
-        return;
-      }
-      res.status(200).json(thread);
-    }
-  );
-});
-
 // this handler is what is used to delete a single thread from the database
 server.delete("/thread/:id", (req, res) => {
   console.log(`request to delete a single thread with id ${req.params}`);
@@ -135,8 +79,62 @@ server.delete("/thread/:id", (req, res) => {
       });
       return;
     }
-    res.status(200).json(thread);
+
+    // remove posts that were attached to this thread
+    Post.deleteMany(
+      {
+        _id: {
+          $in: thread.post_ids,
+        },
+      },
+      function (err, result) {
+        if (err) {
+          console.error(
+            `unable to delete posts belonging to thread with id: ${req.params.id}`
+          );
+        }
+        res.status(200).json(thread);
+      }
+    );
   });
+});
+
+// this handler is what is used to insert a post
+server.post("/post", (req, res) => {
+  console.log(`request to insert a post: `, req.body);
+
+  // add the post to the db
+  Post.create(
+    {
+      author: req.body.author || "",
+      body: req.body.body || "",
+      thread_id: req.body.thread_id,
+    },
+    function (err, post) {
+      res.setHeader("Content-Type", "application/json");
+      if (err) {
+        res.status(500).send({
+          message: `post request failed to create post`,
+          error: err,
+        });
+
+        // record tha this post belongs to the thread
+        Thread.updateOne(
+          { _id: req.params.id },
+          { $push: { post_ids: post._id } },
+          function (err, result) {
+            if (err) {
+              console.error(
+                `unable to delete posts belonging to thread with id: ${req.params.id}`
+              );
+            }
+            res.status(201).json(post);
+          }
+        );
+        return;
+      }
+    }
+  );
 });
 
 module.exports = server;

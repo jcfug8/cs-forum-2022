@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const postSchema = mongoose.Schema(
   {
     author: String,
-    created: Date,
     body: String,
     thread_id: { type: Schema.Types.ObjectId, ref: "Thread" },
   },
