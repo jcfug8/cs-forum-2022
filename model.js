@@ -4,7 +4,7 @@ const postSchema = mongoose.Schema(
   {
     author: String,
     body: String,
-    thread_id: { type: Schema.Types.ObjectId, ref: "Thread" },
+    thread_id: { type: mongoose.Schema.Types.ObjectId, ref: "Thread" },
   },
   { timestamps: true }
 );
@@ -14,7 +14,7 @@ const threadSchema = mongoose.Schema(
     author: String,
     name: String,
     description: String,
-    post_ids: [{ type: Schema.Types.ObjectId, ref: "Post" }],
+    post_ids: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
   },
   { timestamps: true }
 );
