@@ -10,50 +10,24 @@ server.use(express.static(`${__dirname}/public/`));
 
 // this handler is what is used to get a single thread from the database
 server.get("/thread/:id", (req, res) => {
-  let result = {};
   res.setHeader("Content-Type", "application/json");
   console.log(`request to get a single thread with id ${req.params.id}`);
-  Thread.findById(req.params.id)
-    .then((thread) => {
-      // thread - find by id
-      console.log(`got thread:`, thread);
-      result.thread = thread;
-      return Post.find({
-        thread_id: thread._id,
-      });
-    })
-    .catch((err) => {
-      // any error
-      // TODO: handle reverting data on error better.
-      // For now I'm not going to worry about it.
+  Thread.findById(req.params.id, function (err, thread) {
+    if (err) {
       res.status(500).send({
         message: `get request failed to get thread`,
-        id: req.params.id,
         error: err,
       });
-    })
-    .then((posts) => {
-      // post - find
-      console.log(`got posts:`, posts);
-      result.posts = posts;
-      res.status(200).json(result);
-    })
-    .catch((err) => {
-      // any error
-      // TODO: handle reverting data on error better.
-      // For now I'm not going to worry about it.
-      res.status(500).send({
-        message: `get request failed to get posts for thread`,
-        id: req.params.id,
-        error: err,
-      });
-    });
+      return;
+    }
+    res.status(200).json(thread);
+  });
 });
 
 // this handler is what is used to get all threads
 server.get("/thread", (req, res) => {
   console.log(`request to get a all threads`);
-  Thread.find({}, function (err, threads) {
+  Thread.find({}, "-posts", function (err, threads) {
     res.setHeader("Content-Type", "application/json");
     if (err) {
       res.status(500).send({
@@ -93,32 +67,17 @@ server.post("/thread", (req, res) => {
 server.delete("/thread/:id", (req, res) => {
   let result;
   console.log(`request to delete a single thread with id ${req.params}`);
-  Thread.findByIdAndDelete(req.params.id)
-    .then((thread) => {
-      result = thread;
-      return Post.deleteMany({
-        _id: {
-          $in: thread.post_ids,
-        },
-      });
-    })
-    .catch((err) => {
+  Thread.findByIdAndDelete(req.params.id, function (err, thread) {
+    res.setHeader("Content-Type", "application/json");
+    if (err) {
       res.status(500).send({
-        message: `post request failed to delete thread`,
-        id: req.params.id,
+        message: `failed to delete thread`,
         error: err,
       });
-    })
-    .then((delRes) => {
-      res.status(200).json(result);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: `post request failed to delete posts on thread`,
-        id: req.params.id,
-        error: err,
-      });
-    });
+      return;
+    }
+    res.status(200).json(thread);
+  });
 });
 
 // this handler is what is used to insert a post
@@ -128,44 +87,56 @@ server.post("/post", (req, res) => {
   res.setHeader("Content-Type", "application/json");
   // add the post to the db
 
-  Thread.findById(req.params.id)
-    .then((thread) => {
-      return Post.create({
-        author: req.body.author || "",
-        body: req.body.body || "",
-        thread_id: req.body.thread_id,
+  Thread.findByIdAndUpdate(
+    req.body.thread_id,
+    {
+      $push: { posts: new Post(req.body) },
+    },
+    function (err, thread) {
+      if (err) {
+        res.status(500).send({
+          message: `failed to insert post`,
+          error: err,
+        });
+        return;
+      }
+      res.status(200).json(thread.posts[thread.posts.length - 1]);
+    }
+  );
+});
+// this handler is what is used to insert a post
+server.delete("/post/:thread_id/:post_id", (req, res) => {
+  console.log(`request to delete a post:`, req.params.post_id);
+  let post;
+  res.setHeader("Content-Type", "application/json");
+  // add the post to the db
+
+  Thread.findByIdAndUpdate(
+    req.params.thread_id,
+    {
+      $pull: {
+        posts: {
+          _id: req.params.post_id,
+        },
+      },
+    },
+    function (err, thread) {
+      if (err) {
+        res.status(500).send({
+          message: `failed to delete thread`,
+          error: err,
+        });
+        return;
+      }
+      let post;
+      thread.posts.forEach((e) => {
+        if (e._id == req.params.post_id) {
+          post = e;
+        }
       });
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: `unknown thread`,
-        id: req.params.id,
-        error: err,
-      });
-    })
-    .then((resPost) => {
-      console.log("putting new post id into thread");
-      post = resPost;
-      return Thread.updateOne(
-        { _id: req.params.thread_id },
-        { $push: { post_ids: resPost._id } }
-      );
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: `post request failed to create post`,
-        error: err,
-      });
-    })
-    .then((result) => {
-      res.status(201).json(post);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: `unable to update thread with new post id`,
-        error: err,
-      });
-    });
+      res.status(200).json(post);
+    }
+  );
 });
 
 module.exports = server;

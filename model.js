@@ -14,7 +14,7 @@ const threadSchema = mongoose.Schema(
     author: String,
     name: String,
     description: String,
-    post_ids: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
+    posts: [postSchema],
   },
   { timestamps: true }
 );
