@@ -16,7 +16,14 @@ server.get("/thread/:id", (req, res) => {
     if (err) {
       res.status(500).send({
         message: `get request failed to get thread`,
+        id: req.params.id,
         error: err,
+      });
+      return;
+    } else if (thread === null) {
+      res.status(404).send({
+        message: `thread not found`,
+        id: req.params.id,
       });
       return;
     }
@@ -71,8 +78,15 @@ server.delete("/thread/:id", (req, res) => {
     res.setHeader("Content-Type", "application/json");
     if (err) {
       res.status(500).send({
-        message: `failed to delete thread`,
+        message: `post request failed to delete thread`,
+        id: req.params.id,
         error: err,
+      });
+      return;
+    } else if (thread === null) {
+      res.status(404).send({
+        message: `thread not found`,
+        id: req.params.id,
       });
       return;
     }
@@ -92,11 +106,20 @@ server.post("/post", (req, res) => {
     {
       $push: { posts: new Post(req.body) },
     },
+    {
+      returnOriginal: true,
+    },
     function (err, thread) {
       if (err) {
         res.status(500).send({
           message: `failed to insert post`,
           error: err,
+        });
+        return;
+      } else if (thread === null) {
+        res.status(404).send({
+          message: `thread not found`,
+          id: req.params.thread_id,
         });
         return;
       }
@@ -127,6 +150,12 @@ server.delete("/post/:thread_id/:post_id", (req, res) => {
           error: err,
         });
         return;
+      } else if (thread === null) {
+        res.status(404).send({
+          message: `thread not found`,
+          id: req.params.thread_id,
+        });
+        return;
       }
       let post;
       thread.posts.forEach((e) => {
@@ -134,6 +163,15 @@ server.delete("/post/:thread_id/:post_id", (req, res) => {
           post = e;
         }
       });
+
+      if (post == undefined) {
+        res.status(404).send({
+          message: `thread not found`,
+          id: req.params.id,
+        });
+        return;
+      }
+
       res.status(200).json(post);
     }
   );
