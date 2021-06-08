@@ -6,9 +6,9 @@ const db = mongoose.connection;
  * @param {String} host - the hostname for the server running mongo
  * @param {String} db_name - the name of the database on the mogno instance to be used
  */
-function connect(host, db_name) {
+function connect(host, db_name, port) {
   mongoose
-    .connect(`mongodb://new_user:password@${host}/${db_name}`, {
+    .connect(`mongodb://new_user:password@${host}:${port}/${db_name}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
