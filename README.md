@@ -42,6 +42,8 @@ List all of the threads in the database
     "author": "Kevin",
     "description": "cool description",
     "name": "The Name",
+    "createdAt": "2021-06-08T03:14:53.086Z",
+    "updatedAt": "2021-06-08T03:14:53.086Z",
     "__v": 0
   },
   {
@@ -49,6 +51,8 @@ List all of the threads in the database
     "author": "Stacy",
     "description": "another cool description",
     "name": "The Name",
+    "createdAt": "2021-06-08T03:14:53.086Z",
+    "updatedAt": "2021-06-08T03:14:53.086Z",
     "__v": 0
   }
 ]
@@ -89,12 +93,16 @@ Get a specific thread
   "author": "Kevin",
   "description": "cool description",
   "name": "The Name",
+  "createdAt": "2021-06-08T03:14:53.086Z",
+  "updatedAt": "2021-06-08T03:14:53.086Z",
   "posts": [
     {
       "_id": "60a480fbf9c872478ed3da2b",
       "author": "Kyle",
       "body": "The body of the post",
-      "thread_id": "60a480fbf9c872478ed3da2b"
+      "thread_id": "60a480fbf9c872478ed3da2b",
+      "createdAt": "2021-06-08T03:14:53.086Z",
+      "updatedAt": "2021-06-08T03:14:53.086Z"
     }
   ],
   "__v": 0
@@ -144,6 +152,8 @@ Create a new thread. Any argument that is left out will default.
   "author": "Kevin",
   "description": "cool description",
   "name": "The Name",
+  "createdAt": "2021-06-08T03:14:53.086Z",
+  "updatedAt": "2021-06-08T03:14:53.086Z"
   "__v": 0
 }
 ```
@@ -183,12 +193,16 @@ Removes an existing forum and its posts.
   "author": "Kevin",
   "description": "cool description",
   "name": "The Name",
+  "createdAt": "2021-06-08T03:14:53.086Z",
+  "updatedAt": "2021-06-08T03:14:53.086Z",
   "posts": [
     {
       "_id": "60a480fbf9c872478ed3da2b",
       "author": "Kyle",
       "body": "The body of the post",
-      "thread_id": "60a480fbf9c872478ed3da2b"
+      "thread_id": "60a480fbf9c872478ed3da2b",
+      "createdAt": "2021-06-08T03:14:53.086Z",
+      "updatedAt": "2021-06-08T03:14:53.086Z"
     }
   ],
   "__v": 0
@@ -237,7 +251,9 @@ Create a new post. Any argument that is left out will default.
   "_id": "60a480fbf9c872478ed3da2b",
   "author": "Kyle",
   "body": "The body of the post",
-  "thread_id": "60a480fbf9c872478ed3da2b"
+  "thread_id": "60a480fbf9c872478ed3da2b",
+  "createdAt": "2021-06-08T03:14:53.086Z",
+  "updatedAt": "2021-06-08T03:14:53.086Z"
 }
 ```
 
@@ -275,6 +291,8 @@ Removes an existing posts.
   "_id": "60a480fbf9c872478ed3da2b",
   "author": "Kyle",
   "body": "The body of the post",
-  "thread_id": "60a480fbf9c872478ed3da2b"
+  "thread_id": "60a480fbf9c872478ed3da2b",
+  "createdAt": "2021-06-08T03:14:53.086Z",
+  "updatedAt": "2021-06-08T03:14:53.086Z"
 }
 ```
