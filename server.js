@@ -107,7 +107,7 @@ server.post("/post", (req, res) => {
       $push: { posts: new Post(req.body) },
     },
     {
-      returnOriginal: true,
+      new: true,
     },
     function (err, thread) {
       if (err) {
