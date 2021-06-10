@@ -1,8 +1,11 @@
 const express = require("express");
 const { update } = require("./model");
+const cors = require("cors");
 const server = express();
 
 const { Thread, Post } = require("./model");
+
+server.use(cors());
 
 server.use(express.json({}));
 
