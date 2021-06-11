@@ -15,6 +15,7 @@ const threadSchema = mongoose.Schema(
     name: String,
     description: String,
     posts: [postSchema],
+    category: String,
   },
   { timestamps: true }
 );

@@ -58,6 +58,7 @@ server.post("/thread", (req, res) => {
       name: req.body.name || "",
       description: req.body.description || "",
       author: req.body.author || "",
+      category: req.body.category || "",
     },
     function (err, thread) {
       res.setHeader("Content-Type", "application/json");
