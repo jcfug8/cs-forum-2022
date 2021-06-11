@@ -43,6 +43,7 @@ List all of the threads in the database
     "author": "Kevin",
     "description": "cool description",
     "name": "The Name",
+    "category": "Category Name",
     "createdAt": "2021-06-08T03:14:53.086Z",
     "updatedAt": "2021-06-08T03:14:53.086Z",
     "__v": 0
@@ -52,6 +53,7 @@ List all of the threads in the database
     "author": "Stacy",
     "description": "another cool description",
     "name": "The Name",
+    "category": "Category Name",
     "createdAt": "2021-06-08T03:14:53.086Z",
     "updatedAt": "2021-06-08T03:14:53.086Z",
     "__v": 0
@@ -94,6 +96,7 @@ Get a specific thread
   "author": "Kevin",
   "description": "cool description",
   "name": "The Name",
+  "category": "Category Name",
   "createdAt": "2021-06-08T03:14:53.086Z",
   "updatedAt": "2021-06-08T03:14:53.086Z",
   "posts": [
@@ -132,6 +135,7 @@ Create a new thread. Any argument that is left out will default.
 ```json
 {
   "name": "",
+  "category": "",
   "description": "",
   "author": ""
 }
@@ -153,6 +157,7 @@ Create a new thread. Any argument that is left out will default.
   "author": "Kevin",
   "description": "cool description",
   "name": "The Name",
+  "category": "Category Name",
   "createdAt": "2021-06-08T03:14:53.086Z",
   "updatedAt": "2021-06-08T03:14:53.086Z"
   "__v": 0
@@ -194,6 +199,7 @@ Removes an existing forum and its posts.
   "author": "Kevin",
   "description": "cool description",
   "name": "The Name",
+  "category": "Category Name",
   "createdAt": "2021-06-08T03:14:53.086Z",
   "updatedAt": "2021-06-08T03:14:53.086Z",
   "posts": [
