@@ -1,4 +1,4 @@
-# cs-forum-2021
+# cs-forum-2022
 
 - npm init
 - node install --save
@@ -6,7 +6,7 @@
   - mongoose
   - cors
 - docker
-  - docker run -d --name cs-forum-2021-mongo -e MONGO_INITDB_ROOT_USERNAME=user -e MONGO_INITDB_ROOT_PASSWORD=password -e MONGO_INITDB_DATABASE=cs-forum-2021 -p 27018:27017 -v $PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/ mongo
+  - docker run -d --name cs-forum-2022-mongo -e MONGO_INITDB_ROOT_USERNAME=user -e MONGO_INITDB_ROOT_PASSWORD=password -e MONGO_INITDB_DATABASE=cs-forum-2022 -p 27018:27017 -v $PWD/mongo-entrypoint/:/docker-entrypoint-initdb.d/ mongo
 
 # API Reference
 
@@ -44,8 +44,8 @@ List all of the threads in the database
     "description": "cool description",
     "name": "The Name",
     "category": "Category Name",
-    "createdAt": "2021-06-08T03:14:53.086Z",
-    "updatedAt": "2021-06-08T03:14:53.086Z",
+    "createdAt": "2022-06-08T03:14:53.086Z",
+    "updatedAt": "2022-06-08T03:14:53.086Z",
     "__v": 0
   },
   {
@@ -54,8 +54,8 @@ List all of the threads in the database
     "description": "another cool description",
     "name": "The Name",
     "category": "Category Name",
-    "createdAt": "2021-06-08T03:14:53.086Z",
-    "updatedAt": "2021-06-08T03:14:53.086Z",
+    "createdAt": "2022-06-08T03:14:53.086Z",
+    "updatedAt": "2022-06-08T03:14:53.086Z",
     "__v": 0
   }
 ]
@@ -97,16 +97,16 @@ Get a specific thread
   "description": "cool description",
   "name": "The Name",
   "category": "Category Name",
-  "createdAt": "2021-06-08T03:14:53.086Z",
-  "updatedAt": "2021-06-08T03:14:53.086Z",
+  "createdAt": "2022-06-08T03:14:53.086Z",
+  "updatedAt": "2022-06-08T03:14:53.086Z",
   "posts": [
     {
       "_id": "60a480fbf9c872478ed3da2b",
       "author": "Kyle",
       "body": "The body of the post",
       "thread_id": "60a480fbf9c872478ed3da2b",
-      "createdAt": "2021-06-08T03:14:53.086Z",
-      "updatedAt": "2021-06-08T03:14:53.086Z"
+      "createdAt": "2022-06-08T03:14:53.086Z",
+      "updatedAt": "2022-06-08T03:14:53.086Z"
     }
   ],
   "__v": 0
@@ -158,8 +158,8 @@ Create a new thread. Any argument that is left out will default.
   "description": "cool description",
   "name": "The Name",
   "category": "Category Name",
-  "createdAt": "2021-06-08T03:14:53.086Z",
-  "updatedAt": "2021-06-08T03:14:53.086Z"
+  "createdAt": "2022-06-08T03:14:53.086Z",
+  "updatedAt": "2022-06-08T03:14:53.086Z"
   "__v": 0
 }
 ```
@@ -200,16 +200,16 @@ Removes an existing forum and its posts.
   "description": "cool description",
   "name": "The Name",
   "category": "Category Name",
-  "createdAt": "2021-06-08T03:14:53.086Z",
-  "updatedAt": "2021-06-08T03:14:53.086Z",
+  "createdAt": "2022-06-08T03:14:53.086Z",
+  "updatedAt": "2022-06-08T03:14:53.086Z",
   "posts": [
     {
       "_id": "60a480fbf9c872478ed3da2b",
       "author": "Kyle",
       "body": "The body of the post",
       "thread_id": "60a480fbf9c872478ed3da2b",
-      "createdAt": "2021-06-08T03:14:53.086Z",
-      "updatedAt": "2021-06-08T03:14:53.086Z"
+      "createdAt": "2022-06-08T03:14:53.086Z",
+      "updatedAt": "2022-06-08T03:14:53.086Z"
     }
   ],
   "__v": 0
@@ -259,8 +259,8 @@ Create a new post. Any argument that is left out will default.
   "author": "Kyle",
   "body": "The body of the post",
   "thread_id": "60a480fbf9c872478ed3da2b",
-  "createdAt": "2021-06-08T03:14:53.086Z",
-  "updatedAt": "2021-06-08T03:14:53.086Z"
+  "createdAt": "2022-06-08T03:14:53.086Z",
+  "updatedAt": "2022-06-08T03:14:53.086Z"
 }
 ```
 
@@ -276,7 +276,7 @@ Removes an existing posts.
 
 ### Path
 
-- /forum/{thread_id}/{post_id}
+- /thread/{thread_id}/post/{post_id}
 
 ### Body Arguments
 
@@ -299,7 +299,7 @@ Removes an existing posts.
   "author": "Kyle",
   "body": "The body of the post",
   "thread_id": "60a480fbf9c872478ed3da2b",
-  "createdAt": "2021-06-08T03:14:53.086Z",
-  "updatedAt": "2021-06-08T03:14:53.086Z"
+  "createdAt": "2022-06-08T03:14:53.086Z",
+  "updatedAt": "2022-06-08T03:14:53.086Z"
 }
 ```

@@ -7,9 +7,9 @@ const port = process.argv[2];
 // set up what happends when the app connects to the database
 persist.onConnect(() => {
   server.listen(port, () => {
-    console.log(`Code School 2021 Forum App Running on Port ${port}`);
+    console.log(`Code School 2022 Forum App Running on Port ${port}`);
   });
 });
 
 // connect to the database
-persist.connect("127.0.0.1", "cs-forum-2021", "27018");
+persist.connect("127.0.0.1", "cs-forum-2022", "27018");
