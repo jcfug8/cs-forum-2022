@@ -1,18 +1,52 @@
+// init app
 const express = require("express");
-const { update } = require("./model");
+const app = express();
+
+// pull in cors
 const cors = require("cors");
-const server = express();
+// CORS! everyone loves it
+app.use(cors());
+// set up json parser
+app.use(express.json({}));
 
-const { Thread, Post } = require("./model");
+// pull in session stuff
+const sessionSetUp = require("./session");
+sessionSetUp(app);
 
-server.use(cors());
+// pull in auth stuff
+const authSetUp = require("./auth");
+authSetUp(app);
 
-server.use(express.json({}));
+const { Thread, Post, User } = require("./model");
 
-server.use(express.static(`${__dirname}/public/`));
+// set up basic logging middleware
+app.use((req, res, next) => {
+  console.log(req.url);
+  next();
+});
+// allow serving of UI code
+app.use(express.static(`${__dirname}/public/`));
+
+// creating a user
+app.post("/user", (req, res) => {
+  User.create({
+    username: req.body.username,
+    fullname: req.body.fullname,
+    password: req.body.password,
+  })
+    .then((user) => {
+      res.status(201).json(user);
+    })
+    .catch((err) => {
+      res.status(500).json({
+        message: `post request failed to create user`,
+        error: err,
+      });
+    });
+});
 
 // this handler is what is used to get a single thread from the database
-server.get("/thread/:id", (req, res) => {
+app.get("/thread/:id", (req, res) => {
   console.log(`request to get a single thread with id ${req.params.id}`);
   Thread.findById(req.params.id)
     .then((thread) => {
@@ -33,7 +67,7 @@ server.get("/thread/:id", (req, res) => {
 });
 
 // this handler is what is used to get all threads
-server.get("/thread", (req, res) => {
+app.get("/thread", (req, res) => {
   console.log(`request to get a all threads`);
   Thread.find({}, "-posts")
     .then((threads) => {
@@ -48,12 +82,16 @@ server.get("/thread", (req, res) => {
 });
 
 // this handler is what is used to insert a thread
-server.post("/thread", (req, res) => {
+app.post("/thread", (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ mesage: "unauthenticated" });
+    return;
+  }
   console.log(`request to insert a thread: `, req.body);
   Thread.create({
     name: req.body.name || "",
     description: req.body.description || "",
-    author: req.body.author || "",
+    author: req.user.username || "",
     category: req.body.category || "",
   })
     .then((thread) => {
@@ -68,31 +106,64 @@ server.post("/thread", (req, res) => {
 });
 
 // this handler is what is used to delete a single thread from the database
-server.delete("/thread/:id", (req, res) => {
-  let result;
+app.delete("/thread/:id", async (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ mesage: "unauthenticated" });
+    return;
+  }
   console.log(`request to delete a single thread with id ${req.params}`);
-  Thread.findByIdAndDelete(req.params.id)
-    .then((thread) => {
-      if (thread === null) {
-        res.status(404).json({
-          message: `thread not found`,
-          id: req.params.id,
-        });
-        return;
-      }
-      res.status(200).json(thread);
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `post request failed to delete thread`,
-        id: req.params.id,
-        error: err,
-      });
+
+  let thread;
+
+  // get the thread to check if the current user is allow to delete it
+  try {
+    thread = await Thread.findById(req.params.id);
+  } catch (err) {
+    res.status(500).json({
+      message: `failed to delete thread`,
+      error: err,
     });
+    return;
+  }
+
+  // check if we found it
+  if (thread === null) {
+    res.status(404).json({
+      message: `thread not found`,
+      thread_id: req.params.thread_id,
+      post_id: req.params.post_id,
+    });
+    return;
+  }
+
+  // check if the current user made the post
+
+  if (thread.author != req.user.username) {
+    res.status(403).json({ mesage: "unauthorized" });
+    return;
+  }
+
+  // delete the post
+  try {
+    await Thread.findByIdAndDelete(req.params.id);
+  } catch (err) {
+    res.status(500).json({
+      message: `failed to delete post`,
+      error: err,
+    });
+    return;
+  }
+
+  // return
+  res.status(200).json(thread);
 });
 
 // this handler is what is used to insert a post
-server.post("/post", (req, res) => {
+app.post("/post", (req, res) => {
+  if (!req.user) {
+    res.status(401).json({ mesage: "unauthenticated" });
+    return;
+  }
   console.log(`request to insert a post: `, req.body);
   let post;
   // add the post to the db
@@ -100,7 +171,13 @@ server.post("/post", (req, res) => {
   Thread.findByIdAndUpdate(
     req.body.thread_id,
     {
-      $push: { posts: new Post(req.body) },
+      $push: {
+        posts: new Post({
+          author: req.user.username,
+          body: req.body.body,
+          thread_id: req.body.thread,
+        }),
+      },
     },
     {
       new: true,
@@ -124,47 +201,73 @@ server.post("/post", (req, res) => {
     });
 });
 // this handler is what is used to insert a post
-server.delete("/thread/:thread_id/post/:post_id", (req, res) => {
+app.delete("/thread/:thread_id/post/:post_id", async (req, res) => {
   console.log(`request to delete a post:`, req.params.post_id);
-  // add the post to the db
-  Thread.findByIdAndUpdate(req.params.thread_id, {
-    $pull: {
-      posts: {
-        _id: req.params.post_id,
-      },
-    },
-  })
-    .then((thread) => {
-      if (thread === null) {
-        res.status(404).json({
-          message: `thread not found`,
-          id: req.params.thread_id,
-        });
-        return;
-      }
-      let post;
-      thread.posts.forEach((e) => {
-        if (e._id == req.params.post_id) {
-          post = e;
-        }
-      });
+  if (!req.user) {
+    res.status(401).json({ mesage: "unauthenticated" });
+    return;
+  }
 
-      if (post == undefined) {
-        res.status(404).json({
-          message: `thread not found`,
-          id: req.params.id,
-        });
-        return;
-      }
+  let id = req.params.post_id;
+  let thread;
+  let post;
 
-      res.status(200).json(post);
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `failed to delete thread`,
-        error: err,
-      });
+  // get the thread to check if the current user is allow to delete it
+  try {
+    thread = await Thread.findOne({
+      _id: req.params.thread_id,
+      "posts._id": req.params.post_id,
     });
+  } catch (err) {
+    res.status(500).json({
+      message: `failed to delete post`,
+      error: err,
+    });
+    return;
+  }
+
+  // check if we found it
+  if (thread === null) {
+    res.status(404).json({
+      message: `thread not found`,
+      thread_id: req.params.thread_id,
+      post_id: req.params.post_id,
+    });
+    return;
+  }
+
+  // check if the current user made the post
+  for (let key in thread.posts) {
+    console.log(key);
+    post = thread.posts[key];
+    if (post._id == id) {
+      if (post.author != req.user.username) {
+        res.status(403).json({ mesage: "unauthorized" });
+        return;
+      }
+    }
+    break;
+  }
+
+  // delete the post
+  try {
+    await Thread.findByIdAndUpdate(req.params.thread_id, {
+      $pull: {
+        posts: {
+          _id: req.params.post_id,
+        },
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: `failed to delete post`,
+      error: err,
+    });
+    return;
+  }
+
+  // return
+  res.status(200).json(post);
 });
 
-module.exports = server;
+module.exports = app;

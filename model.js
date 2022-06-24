@@ -20,10 +20,26 @@ const threadSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+const userSchema = mongoose.Schema({
+  username: {
+    type: String,
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      "Please fill a valid email address",
+    ],
+    required: true,
+    unique: true,
+  },
+  fullname: { type: String, required: true },
+  password: { type: String, required: true },
+});
+
 const Thread = mongoose.model("Thread", threadSchema);
 const Post = mongoose.model("Post", postSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = {
   Thread,
   Post,
+  User,
 };
