@@ -40,23 +40,35 @@ List all of the threads in the database
 [
   {
     "_id": "60a480fbf9c872478ed3da2b",
-    "author": "Kevin",
+    "user_id": "163480fbf9c872478ed3da98",
     "description": "cool description",
     "name": "The Name",
     "category": "Category Name",
     "createdAt": "2022-06-08T03:14:53.086Z",
     "updatedAt": "2022-06-08T03:14:53.086Z",
-    "__v": 0
+    "__v": 0,
+    "user": {
+      "_id": "163480fbf9c872478ed3da98",
+      "username": "other@gmail.com",
+      "fullname": "John Doe",
+      "__v": 0
+    }
   },
   {
     "_id": "jd9834jc8849cjf84830294j",
-    "author": "Stacy",
+    "user_id": "908480fbf9c872478ed3d867",
     "description": "another cool description",
     "name": "The Name",
     "category": "Category Name",
     "createdAt": "2022-06-08T03:14:53.086Z",
     "updatedAt": "2022-06-08T03:14:53.086Z",
-    "__v": 0
+    "__v": 0,
+    "user": {
+      "_id": "908480fbf9c872478ed3d867",
+      "username": "other@gmail.com",
+      "fullname": "Jane Doe",
+      "__v": 0
+    }
   }
 ]
 ```
@@ -93,7 +105,7 @@ Get a specific thread
 ```json
 {
   "_id": "60a480fbf9c872478ed3da2b",
-  "author": "Kevin",
+  "user_id": "908480fbf9c872478ed3d867",
   "description": "cool description",
   "name": "The Name",
   "category": "Category Name",
@@ -102,14 +114,27 @@ Get a specific thread
   "posts": [
     {
       "_id": "60a480fbf9c872478ed3da2b",
-      "author": "Kyle",
+      "user_id": "8ea480fbf9c872478ed3d84c",
       "body": "The body of the post",
       "thread_id": "60a480fbf9c872478ed3da2b",
       "createdAt": "2022-06-08T03:14:53.086Z",
-      "updatedAt": "2022-06-08T03:14:53.086Z"
+      "updatedAt": "2022-06-08T03:14:53.086Z",
+      "user": {
+      "_id": "8ea480fbf9c872478ed3d84c",
+      "username": "other@gmail.com",
+      "fullname": "John Doe",
+      "__v": 0
+      }
+  }
     }
   ],
-  "__v": 0
+  "__v": 0,
+  "user": {
+      "_id": "908480fbf9c872478ed3d867",
+      "username": "other@gmail.com",
+      "fullname": "John Doe",
+      "__v": 0
+  }
 },
 ```
 
@@ -136,8 +161,7 @@ Create a new thread. Any argument that is left out will default.
 {
   "name": "",
   "category": "",
-  "description": "",
-  "author": ""
+  "description": ""
 }
 ```
 
@@ -147,6 +171,7 @@ Create a new thread. Any argument that is left out will default.
 
 ### Error Codes
 
+- 401 == Not Authenticated
 - 500 == Any Error
 
 ### Example Successful Return
@@ -154,7 +179,7 @@ Create a new thread. Any argument that is left out will default.
 ```json
 {
   "_id": "60a480fbf9c872478ed3da2b",
-  "author": "Kevin",
+  "user_id": "908480fbf9c872478ed3d867",
   "description": "cool description",
   "name": "The Name",
   "category": "Category Name",
@@ -188,6 +213,8 @@ Removes an existing forum and its posts.
 
 ### Error Codes
 
+- 401 == Not Authenticated
+- 403 == Not Authorized
 - 404 == Not Found
 - 500 == Any Other Error
 
@@ -196,7 +223,7 @@ Removes an existing forum and its posts.
 ```json
 {
   "_id": "60a480fbf9c872478ed3da2b",
-  "author": "Kevin",
+  "user_id": "908480fbf9c872478ed3d867",
   "description": "cool description",
   "name": "The Name",
   "category": "Category Name",
@@ -205,7 +232,7 @@ Removes an existing forum and its posts.
   "posts": [
     {
       "_id": "60a480fbf9c872478ed3da2b",
-      "author": "Kyle",
+      "user_id": "8ea480fbf9c872478ed3d84c",
       "body": "The body of the post",
       "thread_id": "60a480fbf9c872478ed3da2b",
       "createdAt": "2022-06-08T03:14:53.086Z",
@@ -238,8 +265,7 @@ Create a new post. Any argument that is left out will default.
 ```json
 {
   "thread_id": "",
-  "description": "",
-  "author": ""
+  "description": ""
 }
 ```
 
@@ -249,6 +275,7 @@ Create a new post. Any argument that is left out will default.
 
 ### Error Codes
 
+- 401 == Not Authenticated
 - 500 == Any Error
 
 ### Example Successful Return
@@ -256,7 +283,7 @@ Create a new post. Any argument that is left out will default.
 ```json
 {
   "_id": "60a480fbf9c872478ed3da2b",
-  "author": "Kyle",
+  "user_id": "8ea480fbf9c872478ed3d84c",
   "body": "The body of the post",
   "thread_id": "60a480fbf9c872478ed3da2b",
   "createdAt": "2022-06-08T03:14:53.086Z",
@@ -288,6 +315,8 @@ Removes an existing posts.
 
 ### Error Codes
 
+- 401 == Not Authenticated
+- 403 == Not Authorized
 - 404 == Not Found
 - 500 == Any Other Error
 
@@ -296,10 +325,115 @@ Removes an existing posts.
 ```json
 {
   "_id": "60a480fbf9c872478ed3da2b",
-  "author": "Kyle",
+  "user_id": "8ea480fbf9c872478ed3d84c",
   "body": "The body of the post",
   "thread_id": "60a480fbf9c872478ed3da2b",
   "createdAt": "2022-06-08T03:14:53.086Z",
   "updatedAt": "2022-06-08T03:14:53.086Z"
+}
+```
+
+---
+
+## Create New Session (authenticate)
+
+Authenticates.
+
+### Method
+
+- POST
+
+### Path
+
+- /session
+
+### Body Arguments
+
+```json
+{
+  "username": "",
+  "password": ""
+}
+```
+
+### Success Code
+
+- 201
+
+### Error Codes
+
+- 401 == Not Authenticated
+
+### Example Successful Return
+
+---
+
+## Get If Authenticated
+
+Authenticates.
+
+### Method
+
+- GET
+
+### Path
+
+- /session
+
+### Body Arguments
+
+- N/A
+
+### Success Code
+
+- 200
+
+### Error Codes
+
+- 401 == Not Authenticated
+
+### Example Successful Return
+
+---
+
+## Create
+
+Create a user.
+
+### Method
+
+- POST
+
+### Path
+
+- /user/
+
+### Body Arguments
+
+```json
+{
+  "username": "",
+  "password": "",
+  "full_name": ""
+}
+```
+
+### Success Code
+
+- 201
+
+### Error Codes
+
+- 500 == Any Error
+
+### Example Successful Return
+
+```json
+{
+  "_id": "62b70f66f4dae754a38ccc9c",
+  "username": "other@gmail.com",
+  "fullname": "John Doe",
+  "password": "pass",
+  "__v": 0
 }
 ```

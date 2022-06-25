@@ -68,7 +68,7 @@ app.get("/thread/:id", async (req, res) => {
   }
   // get the user
   try {
-    let user = await User.findById(thread.user_id);
+    let user = await User.findById(thread.user_id, "-password");
     thread.user = user;
   } catch (err) {
     console.log(
@@ -79,7 +79,7 @@ app.get("/thread/:id", async (req, res) => {
   // get the posts users
   for (let k in thread.posts) {
     try {
-      let user = await User.findById(thread.posts[k].user_id);
+      let user = await User.findById(thread.posts[k].user_id, "-password");
       thread.posts[k].user = user;
     } catch (err) {
       console.log(
@@ -110,7 +110,7 @@ app.get("/thread", async (req, res) => {
   for (let k in threads) {
     try {
       threads[k] = threads[k].toObject();
-      let user = await User.findById(threads[k].user_id);
+      let user = await User.findById(threads[k].user_id, "-password");
       threads[k].user = user;
     } catch (err) {
       console.log(
@@ -128,6 +128,7 @@ app.post("/thread", (req, res) => {
     res.status(401).json({ mesage: "unauthenticated" });
     return;
   }
+  console.log(req.user);
   console.log(`request to insert a thread: `, req.body);
   Thread.create({
     name: req.body.name || "",
@@ -268,7 +269,7 @@ app.delete("/thread/:thread_id/post/:post_id", async (req, res) => {
   // check if we found it
   if (thread === null) {
     res.status(404).json({
-      message: `thread not found`,
+      message: `not found`,
       thread_id: req.params.thread_id,
       post_id: req.params.post_id,
     });
