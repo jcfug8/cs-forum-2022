@@ -2,22 +2,34 @@ const mongoose = require("mongoose");
 
 const postSchema = mongoose.Schema(
   {
-    author: String,
-    body: String,
-    thread_id: { type: mongoose.Schema.Types.ObjectId, ref: "Thread" },
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    body: { type: String, required: true, default: "" },
+    thread_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Thread",
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
 const threadSchema = mongoose.Schema(
   {
-    author: String,
-    name: String,
-    description: String,
-    posts: [postSchema],
-    category: String,
+    user_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    name: { type: String, required: true, default: "" },
+    description: { type: String, required: true, default: "" },
+    posts: { type: [postSchema], required: true, default: [] },
+    category: { type: String, required: true, default: "" },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
 const userSchema = mongoose.Schema({

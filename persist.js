@@ -7,6 +7,7 @@ const db = mongoose.connection;
  * @param {String} db_name - the name of the database on the mogno instance to be used
  */
 function connect(host, db_name, port) {
+  mongoose.set("useCreateIndex", true);
   mongoose
     .connect(`mongodb://new_user:password@${host}:${port}/${db_name}`, {
       useNewUrlParser: true,

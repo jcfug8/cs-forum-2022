@@ -38,8 +38,17 @@ const setUpAuth = function (app) {
 
   // auth routes
   // creating a auth session
-  app.post("/login", passport.authenticate("local"), function (req, res) {
+  app.post("/session", passport.authenticate("local"), function (req, res) {
     res.status(201).json({ message: "successfully created session" });
+  });
+
+  // get if currently logged in
+  app.get("/session", function (req, res) {
+    if (!req.user) {
+      res.status(401).json({ mesage: "unauthenticated" });
+      return;
+    }
+    res.status(200).json({ message: "authenticated" });
   });
 };
 

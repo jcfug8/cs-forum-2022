@@ -21,9 +21,10 @@ const { Thread, Post, User } = require("./model");
 
 // set up basic logging middleware
 app.use((req, res, next) => {
-  console.log(req.url);
+  console.log(`request hitting ${req.method} ${req.url}`);
   next();
 });
+
 // allow serving of UI code
 app.use(express.static(`${__dirname}/public/`));
 
@@ -46,39 +47,79 @@ app.post("/user", (req, res) => {
 });
 
 // this handler is what is used to get a single thread from the database
-app.get("/thread/:id", (req, res) => {
+app.get("/thread/:id", async (req, res) => {
   console.log(`request to get a single thread with id ${req.params.id}`);
-  Thread.findById(req.params.id)
-    .then((thread) => {
-      if (thread === null) {
-        res.status(404).json({
-          message: `thread not found`,
-        });
-        return;
-      }
-      res.status(200).json(thread);
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `get request failed to get thread`,
-        error: err,
+  let thread;
+  // get the thread
+  try {
+    thread = await Thread.findById(req.params.id);
+    if (thread === null) {
+      res.status(404).json({
+        message: `thread not found`,
       });
+      return;
+    }
+    thread = thread.toObject();
+  } catch (err) {
+    res.status(500).json({
+      message: `get request failed to get thread`,
+      error: err,
     });
+  }
+  // get the user
+  try {
+    let user = await User.findById(thread.user_id);
+    thread.user = user;
+  } catch (err) {
+    console.log(
+      `unable to get user ${thread.user_id} when getting thread ${thread._id}`
+    );
+  }
+
+  // get the posts users
+  for (let k in thread.posts) {
+    try {
+      let user = await User.findById(thread.posts[k].user_id);
+      thread.posts[k].user = user;
+    } catch (err) {
+      console.log(
+        `unable to get user ${thread.posts[k].user_id} for post ${thread.posts[k]._id} when getting thread ${thread._id}: ${err}`
+      );
+    }
+  }
+  // return
+  res.status(200).json(thread);
 });
 
 // this handler is what is used to get all threads
-app.get("/thread", (req, res) => {
+app.get("/thread", async (req, res) => {
   console.log(`request to get a all threads`);
-  Thread.find({}, "-posts")
-    .then((threads) => {
-      res.status(200).json(threads);
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: `get request failed to list all threads`,
-        error: err,
-      });
+
+  let threads;
+  // get the threads
+  try {
+    threads = await Thread.find({}, "-posts");
+  } catch (err) {
+    res.status(500).json({
+      message: `get request failed to get thread`,
+      error: err,
     });
+  }
+
+  // get the users
+  for (let k in threads) {
+    try {
+      threads[k] = threads[k].toObject();
+      let user = await User.findById(threads[k].user_id);
+      threads[k].user = user;
+    } catch (err) {
+      console.log(
+        `unable to get user ${threads[k].user_id} when getting thread ${threads[k]._id}: ${err}`
+      );
+    }
+  }
+  // return
+  res.status(200).json(threads);
 });
 
 // this handler is what is used to insert a thread
@@ -91,7 +132,7 @@ app.post("/thread", (req, res) => {
   Thread.create({
     name: req.body.name || "",
     description: req.body.description || "",
-    author: req.user.username || "",
+    user_id: req.user.id || "",
     category: req.body.category || "",
   })
     .then((thread) => {
@@ -131,14 +172,12 @@ app.delete("/thread/:id", async (req, res) => {
     res.status(404).json({
       message: `thread not found`,
       thread_id: req.params.thread_id,
-      post_id: req.params.post_id,
     });
     return;
   }
 
   // check if the current user made the post
-
-  if (thread.author != req.user.username) {
+  if (thread.user_id != req.user.id) {
     res.status(403).json({ mesage: "unauthorized" });
     return;
   }
@@ -173,7 +212,7 @@ app.post("/post", (req, res) => {
     {
       $push: {
         posts: new Post({
-          author: req.user.username,
+          user_id: req.user.id,
           body: req.body.body,
           thread_id: req.body.thread,
         }),
@@ -241,7 +280,7 @@ app.delete("/thread/:thread_id/post/:post_id", async (req, res) => {
     console.log(key);
     post = thread.posts[key];
     if (post._id == id) {
-      if (post.author != req.user.username) {
+      if (post.user_id != req.user.id) {
         res.status(403).json({ mesage: "unauthorized" });
         return;
       }
