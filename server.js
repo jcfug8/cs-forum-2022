@@ -5,7 +5,10 @@ const app = express();
 // pull in cors
 const cors = require("cors");
 // CORS! everyone loves it
-app.use(cors());
+app.use(cors({
+  credentials: true,
+  origin:true
+}));
 // set up json parser
 app.use(express.json({}));
 
@@ -214,7 +217,7 @@ app.post("/post", (req, res) => {
         posts: new Post({
           user_id: req.user.id,
           body: req.body.body,
-          thread_id: req.body.thread,
+          thread_id: req.body.thread_id,
         }),
       },
     },
